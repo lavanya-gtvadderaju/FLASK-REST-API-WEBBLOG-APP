@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Blog</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #ffffff !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #ffffff !important;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+        }
+
+        .flash-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .blogs-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .blogs-list li {
+            margin-bottom: 10px;
+        }
+
+        .blogs-list li a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .logged-in-user {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .logged-in-user a {
+            text-decoration: none;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/">Blog</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if user_id == blog[3] %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/blog">Create Post</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mt-4">{{ blog[1] }}</h1>
+        <p>{{ blog[2] }}</p>
+        {% if user_id == blog[3] %}
+            <a href="#" onclick="showEditForm()" class="btn btn-primary">Edit</a>
+            <a href="#" onclick="deleteBlog({{ blog[0] }})" class="btn btn-danger">Delete</a>
+            <div id="editForm" style="display: none;">
+                <form id="editBlogForm" method="POST" action="/blog/{{ blog[0] }}">
+                    <input type="hidden" name="_method" value="PUT">
+                    <div class="form-group">
+                        <input type="text" name="title" value="{{ blog[1] }}" class="form-control"><br>
+                        <textarea name="content" class="form-control">{{ blog[2] }}</textarea><br>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function showEditForm() {
+            const editForm = document.getElementById('editForm');
+            editForm.style.display = 'block';
+        }
+
+        function deleteBlog(blogId) {
+            if (confirm("Are you sure you want to delete this blog?")) {
+                fetch(`/blog/${blogId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer {{ access_token }}'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Blog deleted successfully");
+                        location.reload();
+                    } else {
+                        alert("Failed to delete blog");
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                    alert("An error occurred");
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blog</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #ffffff !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #ffffff !important;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+        }
+
+        .flash-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .blogs-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .blogs-list li {
+            margin-bottom: 10px;
+        }
+
+        .blogs-list li a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .logged-in-user {
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .logged-in-user a {
+            text-decoration: none;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/">Blog</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if current_user %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/blog">Create Post</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Welcome to the Blog</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li class="flash-message">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        <h2>Blogs:</h2>
+        <ul class="blogs-list">
+            {% for blog in blogs %}
+            <li><a href="/blog/{{ blog[0] }}">{{ blog[1] }}</a></li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        function saveTokenToLocalStorage(token) {
+            localStorage.setItem('access_token', token);
+        }
+
+        function getTokenFromLocalStorage() {
+            return localStorage.getItem('access_token');
+        }
+
+        function removeTokenFromLocalStorage() {
+            localStorage.removeItem('access_token');
+        }
+
+        function refreshToken() {
+            fetch('/refresh_token', {
+                method: 'POST',
+                credentials: 'include'
+            })
+            .then(response => {
+                if (response.ok) {
+                    response.json().then(data => {
+                        const token = data.access_token;
+                        saveTokenToLocalStorage(token);
+                        location.reload();
+                    });
+                } else {
+                    console.log('Failed to refresh token');
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+
+        // Check if token exists in local storage
+        const storedToken = getTokenFromLocalStorage();
+        if (storedToken) {
+            // Verify token validity if needed
+
+            // Perform any additional logic with the token if needed
+        }
+
+        // Refresh the token every 5 minutes (adjust the interval as needed)
+        setInterval(refreshToken, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

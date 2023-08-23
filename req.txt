@@ -1,0 +1,10 @@
+create flask rest api app with mysql having, authentication with jwt and CRUD operations for blog along with slq and html code
+create  and tables for users and posts and provide nessary sql code
+index page should show all posts and having links for signup and login, if user is already signed in it should have logout create delete modify posted blogs.
+after login, JWT authenrization header should be added to website to be able to use in all pages until logout user should be redirected to index page.
+After signup redirected to login page having message "<username> successfully registered please login"
+blog post can be modified and deleted by only the user that created it and JWT auth should be checked
+blog post can be created only when loged in with JWT auth
+anyone can visit individual blog post but only auth user that created that post should have permission to modify and delete which can be done by button on top right corner
+modify post page should prepopulate data for the post being modified
+password should be saved as hashed password rather than plan text
